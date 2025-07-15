@@ -1,0 +1,23 @@
+version: 0.0
+os: linux
+files:
+  - source: /index.html       # GitHub 레포지토리의 루트에 있는 index.html
+    destination: /var/www/html/ # EC2 인스턴스에서 웹 서버의 루트 경로
+permissions:
+  - object: /var/www/html/
+    pattern: "**"
+    owner: apache              # 웹 서버 실행 사용자 (예: apache, nginx)
+    group: apache              # 웹 서버 실행 그룹 (예: apache, nginx)
+hooks:
+  BeforeInstall:
+    - location: scripts/install_dependencies.sh # 웹 서버 설치 및 설정 스크립트 (선택 사항, 이미 설치했으면 생략 가능)
+      timeout: 300
+      runas: root
+  ApplicationStop:
+    - location: scripts/stop_server.sh
+      timeout: 60
+      runas: root
+  ApplicationStart:
+    - location: scripts/start_server.sh
+      timeout: 60
+      runas: root
